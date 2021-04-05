@@ -1,44 +1,152 @@
 <script>
-  import { Matrix } from 'ml-matrix';
+  let fileField;
+  let uploadLabel;
 
-  let rows = 19;
-  let columns = 39;
-  let moves = [];
-  let grid = Array(rows).fill(0).map(() => Array(columns).fill(0));
+  $: uploadLabel = (!fileField || fileField === '') ? 'Select your file!' : fileField.replace(/.*(\/|\\)/, '');
 
-  grid[Math.floor(rows / 2)][Math.floor(columns / 2)] = 1;
-
-  const enterMoves = () => {
+  const processFile = () => {
+    alert(fileField);
   };
 </script>
 
-<!--<label style="display: inline-block;">-->
-<!--  Moves-->
-<!--  <input style="display: inline-block" bind:value={moves}/>-->
-<!--</label>-->
-<!--<button on:click={enterMoves}>Reset</button>-->
-
-<svg class="grid">
-  {#each grid as row, row_i}
-    {#each row as column, col_i}
-      <circle
-        cx={(col_i + 1) * 40}
-        cy={(row_i + 1) * 40}
-        r="10"
-        stroke="#333"
-        stroke-width=".1"
-        fill={column ? 'red' : 'lightgray'}
-      />
-    {/each}
-  {/each}
-</svg>
+<div class="container">
+  <form class="form">
+    <div class="file-upload-wrapper" data-text={uploadLabel}>
+      <input type="file" bind:value={fileField}>
+    </div>
+    <div class="submit-button-wrapper">
+      <button on:click|preventDefault={processFile} type="submit">Process</button>
+    </div>
+  </form>
+</div>
 
 <style>
-    .grid {
-        height: 100%;
+    body {
+        font-family: "Lato", sans-serif;
+    }
+
+    .container {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        -webkit-box-align: center;
+        -moz-box-align: center;
+        box-align: center;
+        -webkit-align-items: center;
+        -moz-align-items: center;
+        -ms-align-items: center;
+        -o-align-items: center;
+        align-items: center;
+        -ms-flex-align: center;
+        display: -webkit-box;
+        display: -moz-box;
+        display: box;
+        display: -webkit-flex;
+        display: -moz-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: center;
+        -moz-box-pack: center;
+        box-pack: center;
+        -webkit-justify-content: center;
+        -moz-justify-content: center;
+        -ms-justify-content: center;
+        -o-justify-content: center;
+        justify-content: center;
+        -ms-flex-pack: center;
+        background-color: #bf7a6b;
+        background-image: -webkit-linear-gradient(bottom left, #bf7a6b 0%, #e6d8a7 100%);
+        background-image: linear-gradient(to top right, #bf7a6b 0%, #e6d8a7 100%);
+    }
+
+    .form {
+        width: 400px;
+    }
+
+    .file-upload-wrapper {
+        position: relative;
         width: 100%;
-        position: fixed;
-        top: -20px;
-        left: -20px;
+        height: 60px;
+    }
+
+    .file-upload-wrapper:after {
+        content: attr(data-text);
+        font-size: 18px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: #fff;
+        padding: 10px 15px;
+        display: block;
+        width: calc(100% - 40px);
+        pointer-events: none;
+        z-index: 20;
+        height: 40px;
+        line-height: 40px;
+        color: #999;
+        border-radius: 5px 10px 10px 5px;
+        font-weight: 300;
+    }
+
+    .file-upload-wrapper:before {
+        content: "Upload";
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: inline-block;
+        height: 60px;
+        background: #4daf7c;
+        color: #fff;
+        font-weight: 700;
+        z-index: 25;
+        font-size: 16px;
+        line-height: 60px;
+        padding: 0 15px;
+        text-transform: uppercase;
+        pointer-events: none;
+        border-radius: 0 5px 5px 0;
+    }
+
+    .file-upload-wrapper:hover:before {
+        background: #3d8c63;
+    }
+
+    .file-upload-wrapper input {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 99;
+        height: 40px;
+        margin: 0;
+        padding: 0;
+        display: block;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .submit-button-wrapper {
+        width: 100%;
+        height: 60px;
+        padding-right: 10%;
+        padding-left: 10%;
+        margin-top: 15px;
+    }
+
+    .submit-button-wrapper button {
+        width: 80%;
+        height: 40px;
+        border-radius: 5px;
+        background: #4daf7c;
+        color: #fff;
+        font-weight: 700;
+        z-index: 25;
+        font-size: 16px;
+        line-height: 60px;
+        text-transform: uppercase;
     }
 </style>

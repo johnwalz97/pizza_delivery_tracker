@@ -1,105 +1,53 @@
-*Looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
+# Pizza Delivery Tracking System
 
 ---
 
-# svelte app
+### Description
 
-This is a project template for [Svelte](https://svelte.dev) apps. It lives at https://github.com/sveltejs/template.
+This repository contains python code in the `delivery_tracker` directory
+which can process dispatcher inputs (^, <, >, or v) and calculate the total
+number of houses which had pizzas delivered to them.
 
-To create a new project based on this template using [degit](https://github.com/Rich-Harris/degit):
+The `public` and `src` directories contain a Svelte web application which allows
+users to upload a file of commands or type in a list of commands. The browser will
+call the python backend and return a 2d graphic showing the delivery paths.
+
+The web app is still a WIP. The plan is to have this hosted on AWS Lambda using the 
+serverless framework if I have the time. If not, it should work locally.
+
+The python code will work as the backend, but it can also be called from the command
+line (see instructions for this below).
+
+### Installation
+
+To install python requirements:
 
 ```bash
-npx degit sveltejs/template svelte-app
-cd svelte-app
+pip install -r requirements.txt
 ```
 
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
-
-
-## Get started
-
-Install the dependencies...
+To install javascript requirements:
 
 ```bash
-cd svelte-app
 npm install
 ```
 
-...then start [Rollup](https://rollupjs.org):
+### Usage
 
+Once you have all dependencies installed, you can run the `delivery_tracker.py` script using any
+one of the following commands:
 ```bash
-npm run dev
+python delivery_tracker/delivery_tracker.py # will prompt user to type in moves
+python delivery_tracker/delivery_tracker.py --agents 2 # same as above but with 2 agents
+python delivery_tracker/delivery_tracker.py --agents 3 --moves-file test.txt # loads moves from input.txt file and tracks 3 agents
 ```
 
-Navigate to [localhost:5000](http://localhost:5000). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
-
-By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
-
-If you're using [Visual Studio Code](https://code.visualstudio.com/) we recommend installing the official extension [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode). If you are using other editors you may need to install a plugin in order to get syntax highlighting and intellisense.
-
-## Building and running in production mode
-
-To create an optimised version of the app:
-
+There is also another python script called `animate.py` which can be run to produce a plot of the
+deliveries made. To try out the plotting functionality run the following command:
 ```bash
-npm run build
+python delivery_tracker/animate.py
 ```
+Then open the `animation.png` file which is created to see the result.
 
-You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
-
-
-## Single-page app mode
-
-By default, sirv will only respond to requests that match files in `public`. This is to maximise compatibility with static fileservers, allowing you to deploy your app anywhere.
-
-If you're building a single-page app (SPA) with multiple routes, sirv needs to be able to respond to requests for *any* path. You can make it so by editing the `"start"` command in package.json:
-
-```js
-"start": "sirv public --single"
-```
-
-## Using TypeScript
-
-This template comes with a script to set up a TypeScript development environment, you can run it immediately after cloning the template with:
-
-```bash
-node scripts/setupTypeScript.js
-```
-
-Or remove the script via:
-
-```bash
-rm scripts/setupTypeScript.js
-```
-
-## Deploying to the web
-
-### With [Vercel](https://vercel.com)
-
-Install `vercel` if you haven't already:
-
-```bash
-npm install -g vercel
-```
-
-Then, from within your project folder:
-
-```bash
-cd public
-vercel deploy --name my-project
-```
-
-### With [surge](https://surge.sh/)
-
-Install `surge` if you haven't already:
-
-```bash
-npm install -g surge
-```
-
-Then, from within your project folder:
-
-```bash
-npm run build
-surge public my-project.surge.sh
-```
+*Feel free to play around with the variables in the script or change the input file to
+see how it all works.

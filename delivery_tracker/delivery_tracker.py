@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from itertools import cycle
 from pathlib import Path
 from typing import List, Tuple
 
@@ -49,20 +50,26 @@ def vectorize_moves(moves: str) -> List[np.ndarray]:
     return [moves_map[move] for move in moves]
 
 
-def track_deliveries(vectors: List[np.ndarray], calculate_grid: bool = True) -> Tuple[np.ndarray, Tuple[List, List]]:
+def track_deliveries(
+        vectors: List[np.ndarray],
+        num_agents: int = 1,
+        calculate_grid: bool = True,
+) -> Tuple[np.ndarray, Tuple[List, List]]:
     """
     Iterates through the list of moves which have been vectorized. Tracks house coordinates visited and optionally
     tracks the min and max x,y coordinates that describe a diagonal for a square 2d grid which can contain all the
     deliveries.
 
     :param vectors: list of vectorized moves to iterate through
+    :param num_agents: number of delivery agents (agents take turns doing deliveries)
     :param calculate_grid: flag specifying whether or not to calculate the grid diagonal
     :return: tuple containing the positions visited as well as the coordinates for the grid diagonal
     """
-    current_position = np.array([0, 0])
+    agents = cycle(range(num_agents))
+    agent_positions = [np.array([0, 0]) for _ in range(num_agents)]
 
-    deliveries = np.ndarray((len(vectors) + 1, 2))
-    deliveries[0] = current_position
+    deliveries = np.ndarray((len(vectors) + 1, 3))
+    deliveries[0] = np.array([0, 0, 0])
 
     min_x = 0
     max_x = 0
@@ -70,10 +77,17 @@ def track_deliveries(vectors: List[np.ndarray], calculate_grid: bool = True) -> 
     max_y = 0
 
     for i, move in enumerate(vectors, start=1):
-        current_position += move
+        current_agent = next(agents)
 
-        deliveries[i] = current_position
+        # have the current agent perform the next move (add move vector to agent's position)
+        agent_positions[current_agent] += move
+        current_position = agent_positions[current_agent]
 
+        # add delivery coordinates and current agent index into the list of all deliveries
+        deliveries[i] = np.append(current_position, current_agent)
+
+        # all this does is check if the current position is farther out on the grid than
+        # any of the previous deliveries and if it is it updates the max or min x,y coords
         if calculate_grid:
             if current_position[0] < min_x:
                 min_x = current_position[0]
@@ -90,6 +104,7 @@ def track_deliveries(vectors: List[np.ndarray], calculate_grid: bool = True) -> 
 def process_moves(
         moves_str: str = None,
         moves_file: Path = None,
+        num_agents: int = 1,
         calculate_grid: bool = True,
 ) -> Tuple[int, np.ndarray, Tuple[List, List]]:
     """
@@ -100,6 +115,7 @@ def process_moves(
 
     :param moves_str: string of dispatcher inputs
     :param moves_file: file path pointing to flat text file containing dispatcher inputs
+    :param num_agents: number of agents that will be delivering pizzas (agents take turns doing deliveries)
     :param calculate_grid: indicates whether or not to calculate grid diagonal - Useful for large
                            inputs when the diagonal is not required, as this can save some processing time.
     :return: tuple containing the number of unique houses visited, the positions visited as well as the
@@ -121,9 +137,9 @@ def process_moves(
     validate_moves(moves)
     vectorized_moves = vectorize_moves(moves)
 
-    deliveries, diagonal = track_deliveries(vectorized_moves, calculate_grid)
+    deliveries, diagonal = track_deliveries(vectorized_moves, num_agents, calculate_grid)
 
-    return len(np.unique(deliveries, axis=0)), deliveries, diagonal
+    return len(np.unique(deliveries[:, :2], axis=0)), deliveries, diagonal
 
 
 if __name__ == '__main__':
@@ -134,13 +150,14 @@ if __name__ == '__main__':
     '''
     parser = ArgumentParser(description=help_text)
     parser.add_argument('--moves-file', help='flat text file containing only valid dispatcher inputs', type=Path)
+    parser.add_argument('--agents', default=1, help='number of delivery agents', type=int)
     args = parser.parse_args()
 
     if args.moves_file:
-        unique_houses, _, grid_diagonal = process_moves(moves_file=args.moves_file)
+        unique_houses, _, grid_diagonal = process_moves(moves_file=args.moves_file, num_agents=args.agents)
     else:
         raw_input = input('Enter the list of moves: ')
-        unique_houses, _, grid_diagonal = process_moves(moves_str=raw_input)
+        unique_houses, _, grid_diagonal = process_moves(moves_str=raw_input, num_agents=args.agents)
 
     print(f'Number of unique house visited: {unique_houses}')
     print(f'Grid diagonal coordinates: {grid_diagonal[0]} {grid_diagonal[1]}')
