@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from itertools import cycle
+from math import ceil, sqrt
 from pathlib import Path
 from typing import List, Tuple
 
@@ -159,5 +160,11 @@ if __name__ == '__main__':
         raw_input = input('Enter the list of moves: ')
         unique_houses, _, grid_diagonal = process_moves(moves_str=raw_input, num_agents=args.agents)
 
+    grid_diagonal_length = ceil(sqrt(
+        (grid_diagonal[1][0] - grid_diagonal[0][0]) ** 2 +
+        (grid_diagonal[1][1] - grid_diagonal[0][1]) ** 2
+    ))
+
     print(f'Number of unique house visited: {unique_houses}')
     print(f'Grid diagonal coordinates: {grid_diagonal[0]} {grid_diagonal[1]}')
+    print(f'Grid diagonal length: {grid_diagonal_length}')
